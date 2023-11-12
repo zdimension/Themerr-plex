@@ -108,6 +108,8 @@
                                     {% set theme_status_color = 'table-danger' %}
                                 {% elif item['theme_status'] == 'failed' %}
                                     {% set theme_status_color = 'table-warning' %}
+                                {% elif item['theme_status'] == 'pending' %}
+                                    {% set theme_status_color = 'table-info' %}
                                 {% else %}
                                     {% set theme_status_color = 'table-danger' %}
                                 {% endif %}
@@ -142,6 +144,8 @@
                                             <i class="fas fa-check-circle text-success"></i> {{ _('Themerr-provided') }}
                                         {% elif item['theme_status'] == 'missing' %}
                                             <i class="fas fa-times-circle text-danger"></i> {{ _('Missing from ThemerrDB') }}
+                                        {% elif item['theme_status'] == 'pending' %}
+                                            <i class="fas fa-exclamation-circle text-info"></i> {{ _('Addition pending') }}
                                         {% elif item['theme_status'] == 'failed' %}
                                             <i class="fas fa-exclamation-circle text-warning"></i> {{ _('Failed to download') }}
                                         {% else %}

@@ -13,6 +13,7 @@ else:  # the code is running outside of Plex
     from plexhints.parse_kit import JSON  # parse kit
 
 # imports from Libraries\Shared
+import requests
 from typing import Union
 
 database_cache = {}
@@ -130,3 +131,51 @@ def item_exists(database_type, database, id):
 
     type_cache = database_cache[database_type]
     return database in type_cache and str(id) in type_cache[database]
+
+
+def get_pending_themes():
+    # type: () -> set[str]
+    """
+    Get the URLs of all pending theme requests.
+    
+    Returns
+    -------
+    set[str]
+        A set of URLs of all pending theme requests.
+        
+    Examples
+    --------
+    >>> next(get_pending_themes())
+    'https://www.themoviedb.org/movie/1234-thing'
+    """
+
+    url = "https://api.github.com/repos/LizardByte/ThemerrDB/issues?state=open&labels=request-theme&per_page=100"
+    results = set()
+
+    Log.Info('Pending list updating...')
+
+    while True:
+        r = requests.get(url)
+        content = r.json()
+
+        for obj in content:
+            try:
+                issue_body = obj['body'] 
+                # body is in the form
+                # "### Database URL\n\nhttps://www.themoviedb.org/movie/1234-thing\n\n" +
+                # "### YouTube Theme Song Video URL\n\nhttps://www.youtube.com/watch?v=fakevideo"
+                item_url = issue_body.split('### Database URL\n\n')[1].split('\n\n')[0]  # yeah...
+                assert item_url.startswith('http')
+                results.add(item_url)
+            except:
+                continue
+
+        if 'next' in r.links:
+            url = r.links['next']['url']
+        else:
+            break
+
+    Log.Info('Pending list updated ({} items)'.format(len(results)))
+    Log.Debug('Pending list: {}'.format(results))
+
+    return results

@@ -212,6 +212,8 @@ def home():
 
     themerr_db_helper.update_cache()
 
+    pending = themerr_db_helper.get_pending_themes()
+
     sections = plex_library.sections()
 
     items = dict()
@@ -334,7 +336,10 @@ def home():
                 if issue_action == 'edit':
                     theme_status = 'failed'
                 else:
-                    theme_status = 'missing'
+                    if item_issue_url in pending:
+                        theme_status = 'pending'
+                    else:
+                        theme_status = 'missing'
 
                 user_supplied = False
 
